@@ -7,7 +7,7 @@ let articlesRecords = {
 
 async function fetchRecordsFromCrossRef() {
 
-  const response = await superagent.get('https://api.crossref.org/works?rows=50')
+  const response = await superagent.get('https://api.crossref.org/works?rows=1000')
   const { message: { items } } = response.body
   const itemsWithTitle = items.filter(({ title }) => title !== undefined)
 
@@ -23,12 +23,12 @@ async function fetchRecordsFromCrossRef() {
       publisher: item.publisher,
       url: item.URL,
       title: item.title.toString(),
-      language: item.language
+      language: item.language ||  'Not Found'
     }
     const authors = {
       doi: item.DOI,
       firstAuthor: firstAuthor.family,
-      secondAuthor: secondAuthor?.family
+      secondAuthor: secondAuthor?.family || 'Not Found'
     }
     const types = {
       doi: item.DOI,
@@ -45,7 +45,7 @@ async function fetchRecordsFromCrossRef() {
 };
 
 async function fetchRecordsFromDataCite() {
-  const response = await superagent.get('https://api.test.datacite.org/dois?random=true&page[size]=100')
+  const response = await superagent.get('https://api.test.datacite.org/dois?random=true&page[size]=1000')
   const { data } = response.body
   for (let item of data) {
     const { attributes } = item
@@ -63,11 +63,12 @@ async function fetchRecordsFromDataCite() {
       url: attributes.url,
       title: title,
       language: attributes.language
+      
     }
     const authors = {
       doi: attributes.doi,
       firstAuthor: firstCreator.name,
-      secondAuthor: secondCreator?.name,
+      secondAuthor: secondCreator?.name ||  'Not Found',
 
     }
     const types = {
